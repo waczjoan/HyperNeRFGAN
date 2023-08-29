@@ -12,7 +12,7 @@ import os
 import warnings
 import numpy as np
 import torch
-import dnnlib
+import hyper_nerf_gan.src.dnnlib as dnnlib
 import traceback
 
 from .. import custom_ops

@@ -16,17 +16,17 @@ from torch import Tensor
 from omegaconf import OmegaConf
 import torch.nn.functional as F
 
-from nerf.run_nerf import render, run_network
-from nerf.run_nerf_helpers import get_embedder
-from nerf.load_blender import pose_spherical
-from torch_utils import misc
-from torch_utils import persistence
-from torch_utils.misc import uniform_circle
-from torch_utils.ops import conv2d_resample
-from torch_utils.ops import upfirdn2d
-from torch_utils.ops import bias_act
-from torch_utils.ops import fma
-from training.layers import FullyConnectedLayer, GenInput, CoordFuser
+from hyper_nerf_gan.src.nerf.run_nerf import render, run_network
+from hyper_nerf_gan.src.nerf.run_nerf_helpers import get_embedder
+from hyper_nerf_gan.src.nerf.load_blender import pose_spherical
+from hyper_nerf_gan.src.torch_utils import misc
+from hyper_nerf_gan.src.torch_utils import persistence
+from hyper_nerf_gan.src.torch_utils.misc import uniform_circle
+from hyper_nerf_gan.src.torch_utils.ops import conv2d_resample
+from hyper_nerf_gan.src.torch_utils.ops import upfirdn2d
+from hyper_nerf_gan.src.torch_utils.ops import bias_act
+from hyper_nerf_gan.src.torch_utils.ops import fma
+from hyper_nerf_gan.src.training.layers import FullyConnectedLayer, GenInput, CoordFuser
 
 #----------------------------------------------------------------------------
 

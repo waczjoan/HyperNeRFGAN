@@ -18,11 +18,14 @@ import torch
 from hydra.experimental import compose, initialize
 from omegaconf import OmegaConf, DictConfig
 
-import dnnlib
-from training import training_loop
-from metrics import metric_main
-from torch_utils import training_stats
-from torch_utils import custom_ops
+from .dnnlib import EasyDict
+from .training import training_loop
+from .metrics import metric_main
+from .torch_utils import training_stats
+from .torch_utils import custom_ops
+
+from hyper_nerf_gan.src.dnnlib.util import Logger, construct_class_by_name
+
 
 #----------------------------------------------------------------------------
 
@@ -71,8 +74,8 @@ def setup_training_loop_kwargs(
     # Configuration
     hydra_cfg_name = None, # Name of the hydra config
 ):
-    args = dnnlib.EasyDict()
-    initialize(config_path="../../../configs", job_name="INR-GAN training")
+    args = EasyDict()
+    initialize(config_path="../../../../../experiments/configs", job_name="INR-GAN training")
     hydra_cfg = compose(config_name=hydra_cfg_name)
 
     # ------------------------------------------
@@ -114,10 +117,14 @@ def setup_training_loop_kwargs(
 
     assert data is not None
     assert isinstance(data, str)
-    args.training_set_kwargs = dnnlib.EasyDict(class_name='training.dataset.ImageFolderDataset', path=data, use_labels=True, max_size=None, xflip=False)
-    args.data_loader_kwargs = dnnlib.EasyDict(pin_memory=True, num_workers=3, prefetch_factor=2)
+    args.training_set_kwargs = EasyDict(
+        class_name='hyper_nerf_gan.src.training.dataset.ImageFolderDataset',
+        path=data, use_labels=True,
+        max_size=None, xflip=False
+    )
+    args.data_loader_kwargs = EasyDict(pin_memory=True, num_workers=3, prefetch_factor=2)
     try:
-        training_set = hyper_nerf_gan.src.dnnlib.util.construct_class_by_name(**args.training_set_kwargs) # subclass of training.dataset.Dataset
+        training_set = construct_class_by_name(**args.training_set_kwargs) # subclass of training.dataset.Dataset
         args.training_set_kwargs.resolution = training_set.resolution # be explicit about resolution
         args.training_set_kwargs.use_labels = training_set.has_labels # be explicit about labels
         args.training_set_kwargs.max_size = len(training_set) # be explicit about dataset size
@@ -172,7 +179,7 @@ def setup_training_loop_kwargs(
     }
 
     assert cfg in cfg_specs
-    spec = dnnlib.EasyDict(cfg_specs[cfg])
+    spec = EasyDict(cfg_specs[cfg])
     if cfg == 'auto':
         desc += f'{gpus:d}'
         spec.ref_gpus = gpus
@@ -184,9 +191,9 @@ def setup_training_loop_kwargs(
         spec.r1_gamma = 0.0002 * (res ** 2) / spec.mb # heuristic formula
         spec.ema = spec.mb * 10 / 32
 
-    args.D_kwargs = dnnlib.EasyDict(class_name='training.networks.Discriminator', block_kwargs=dnnlib.EasyDict(), mapping_kwargs=dnnlib.EasyDict(), epilogue_kwargs=dnnlib.EasyDict())
+    args.D_kwargs = EasyDict(class_name='hyper_nerf_gan.src.training.networks.Discriminator', block_kwargs=EasyDict(), mapping_kwargs=EasyDict(), epilogue_kwargs=EasyDict())
     if cfg == 'nerf':
-        args.G_kwargs = dnnlib.EasyDict(class_name='training.networks.NeRFGenerator', z_dim=128, w_dim=128, mapping_kwargs=dnnlib.EasyDict(), synthesis_kwargs=dnnlib.EasyDict())
+        args.G_kwargs = EasyDict(class_name='hyper_nerf_gan.src.training.networks.NeRFGenerator', z_dim=128, w_dim=128, mapping_kwargs=EasyDict(), synthesis_kwargs=EasyDict())
         args.G_kwargs.synthesis_kwargs.width = int(hydra_cfg.generator.get('width', spec.width))
         args.G_kwargs.synthesis_kwargs.num_layers = hydra_cfg.generator.get('num_layers', spec.num_layers)
         args.G_kwargs.synthesis_kwargs.perturb = hydra_cfg.generator.get('perturb', spec.perturb)
@@ -206,8 +213,8 @@ def setup_training_loop_kwargs(
         args.D_kwargs.patch_size = hydra_cfg.generator.get('patch_size', spec.patch_size)
         args.D_kwargs.channel_max = 512
     else:
-        args.G_kwargs = dnnlib.EasyDict(class_name='training.networks.Generator', z_dim=512, w_dim=512,
-                                        mapping_kwargs=dnnlib.EasyDict(), synthesis_kwargs=dnnlib.EasyDict())
+        args.G_kwargs = EasyDict(class_name='hyper_nerf_gan.src.training.networks.Generator', z_dim=512, w_dim=512,
+                                        mapping_kwargs=EasyDict(), synthesis_kwargs=EasyDict())
 
         args.G_kwargs.synthesis_kwargs.channel_base = int(hydra_cfg.generator.get('fmaps', spec.fmaps) * 32768)
         args.G_kwargs.synthesis_kwargs.num_fp16_res = 4  # enable mixed-precision training
@@ -228,9 +235,9 @@ def setup_training_loop_kwargs(
         args.D_kwargss.num_fp16_res = 0
         args.D_kwargss.conv_clamp = None
 
-    args.G_opt_kwargs = dnnlib.EasyDict(class_name='torch.optim.Adam', lr=hydra_cfg.get('optim', {}).get('lr', spec.lrate), betas=[0, 0.99], eps=1e-8)
-    args.D_opt_kwargs = dnnlib.EasyDict(class_name='torch.optim.Adam', lr=hydra_cfg.get('optim', {}).get('lr', spec.lrate), betas=[0, 0.99], eps=1e-8)
-    args.loss_kwargs = dnnlib.EasyDict(class_name='training.loss.StyleGAN2Loss', r1_gamma=spec.r1_gamma)
+    args.G_opt_kwargs = EasyDict(class_name='torch.optim.Adam', lr=hydra_cfg.get('optim', {}).get('lr', spec.lrate), betas=[0, 0.99], eps=1e-8)
+    args.D_opt_kwargs = EasyDict(class_name='torch.optim.Adam', lr=hydra_cfg.get('optim', {}).get('lr', spec.lrate), betas=[0, 0.99], eps=1e-8)
+    args.loss_kwargs = EasyDict(class_name='hyper_nerf_gan.src.training.loss.StyleGAN2Loss', r1_gamma=spec.r1_gamma)
 
     args.total_kimg = spec.kimg
     args.batch_size = spec.mb
@@ -341,7 +348,7 @@ def setup_training_loop_kwargs(
 
     assert augpipe in augpipe_specs
     if aug != 'noaug':
-        args.augment_kwargs = dnnlib.EasyDict(class_name='training.augment.AugmentPipe', **augpipe_specs[augpipe])
+        args.augment_kwargs = EasyDict(class_name='hyper_nerf_gan.src.training.augment.AugmentPipe', **augpipe_specs[augpipe])
 
     # ----------------------------------
     # Transfer learning: resume, freezed
@@ -418,7 +425,7 @@ def setup_training_loop_kwargs(
 #----------------------------------------------------------------------------
 
 def subprocess_fn(rank, args, temp_dir):
-    hyper_nerf_gan.src.dnnlib.util.Logger(file_name=os.path.join(args.run_dir, 'log.txt'), file_mode='a', should_flush=True)
+    Logger(file_name=os.path.join(args.run_dir, 'log.txt'), file_mode='a', should_flush=True)
 
     # Init torch.distributed.
     if args.num_gpus > 1:
@@ -496,7 +503,7 @@ class CommaSeparatedList(click.ParamType):
 # Configuration
 @click.option('--hydra_cfg_name', help='Name of the Hydra hyperparams config', type=str, metavar='STR')
 
-def main(ctx, outdir, dry_run, **config_kwargs):
+def train(ctx, outdir, dry_run, **config_kwargs):
     """Train a GAN using the techniques described in the paper
     "Training Generative Adversarial Networks with Limited Data".
 
@@ -540,7 +547,7 @@ def main(ctx, outdir, dry_run, **config_kwargs):
       lsundog256     LSUN Dog trained at 256x256 resolution.
       <PATH or URL>  Custom network pickle.
     """
-    hyper_nerf_gan.src.dnnlib.util.Logger(should_flush=True)
+    Logger(should_flush=True)
 
     # Setup training options.
     try:
@@ -596,6 +603,6 @@ def main(ctx, outdir, dry_run, **config_kwargs):
 #----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    main() # pylint: disable=no-value-for-parameter
+    train() # pylint: disable=no-value-for-parameter
 
 #----------------------------------------------------------------------------

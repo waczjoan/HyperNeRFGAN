@@ -7,9 +7,9 @@ import torch.nn.functional as F
 import numpy as np
 from omegaconf import DictConfig
 
-from torch_utils import persistence
-from torch_utils.ops import bias_act
-from torch_utils import misc
+from hyper_nerf_gan.src.torch_utils import persistence
+from hyper_nerf_gan.src.torch_utils.ops import bias_act
+from hyper_nerf_gan.src.torch_utils import misc
 
 #----------------------------------------------------------------------------
 
@@ -265,7 +265,7 @@ def generate_coords(batch_size: int, img_size: int, device='cpu', align_corners:
 
 def generate_logarithmic_basis(
     resolution: int,
-    max_num_feats: int=np.float('inf'),
+    max_num_feats: int=float('inf'),
     remove_lowest_freq: bool=False,
     use_diagonal: bool=True) -> Tensor:
     """

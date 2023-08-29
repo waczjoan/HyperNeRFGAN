@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hyper-nerf-pytorch"
+name = "hyper-nerf-gan"
 requires-python = ">=3.9"
 authors = [
     {name = "waczyjoan"},
@@ -22,7 +22,7 @@ dependencies = [
         "imageio",
         "imageio-ffmpeg",
         "protobuf>=3.20.1",
-        "hydra-core>=1.0.6",
+        "hydra-core==1.0.6",
         "click>=7.1.2",
         "scipy>=1.6.1",
         "ninja>=1.10.0",
@@ -35,7 +35,7 @@ dependencies = [
 
 
 [tool.setuptools.dynamic]
-version = {attr = "hyper-nerf-pytorch.VERSION"}
+version = {attr = "hyper-nerf-gan.VERSION"}
 readme = {file = ["README.md"]}
 
 [tool.setuptools.packages]

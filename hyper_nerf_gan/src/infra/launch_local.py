@@ -16,8 +16,9 @@ from utils import (
 )
 
 
+
 @hydra.main(config_name="../../configs/main.yml")
-def main(cfg: DictConfig) -> str:
+def main(cfg: DictConfig) -> DictConfig:
     for key in cfg:
         if isinstance(cfg[key], DictConfig) and '_target_' in cfg[key]:
             cfg[key] = instantiate(cfg[key])
@@ -25,6 +26,9 @@ def main(cfg: DictConfig) -> str:
     print("<=== CONFIG ===>")
     print(OmegaConf.to_yaml(cfg))
 
+    lunch_local(cfg=cfg)
+
+def lunch_local(cfg: DictConfig) -> str:
     before_train_cmd = '\n'.join(cfg.env.before_train_commands)
     torch_extensions_dir = os.environ.get('TORCH_EXTENSIONS_DIR', cfg.env.torch_extensions_dir)
     python_bin = cfg.env.python_bin

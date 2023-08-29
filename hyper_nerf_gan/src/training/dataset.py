@@ -12,7 +12,7 @@ import zipfile
 import PIL.Image
 import json
 import torch
-import dnnlib
+import hyper_nerf_gan.src.dnnlib as dnnlib
 
 try:
     import pyspng

@@ -20,7 +20,7 @@ import inspect
 import copy
 import uuid
 import types
-import dnnlib
+import hyper_nerf_gan.src.dnnlib as dnnlib
 
 #----------------------------------------------------------------------------
 

@@ -9,12 +9,12 @@
 import numpy as np
 import scipy.signal
 import torch
-from torch_utils import persistence
-from torch_utils import misc
-from torch_utils.misc import make_indexing_channels
-from torch_utils.ops import upfirdn2d
-from torch_utils.ops import grid_sample_gradfix
-from torch_utils.ops import conv2d_gradfix
+from hyper_nerf_gan.src.torch_utils import persistence
+from hyper_nerf_gan.src.torch_utils import misc
+from hyper_nerf_gan.src.torch_utils.misc import make_indexing_channels
+from hyper_nerf_gan.src.torch_utils.ops import upfirdn2d
+from hyper_nerf_gan.src.torch_utils.ops import grid_sample_gradfix
+from hyper_nerf_gan.src.torch_utils.ops import conv2d_gradfix
 
 #----------------------------------------------------------------------------
 # Coefficients of various wavelet decomposition low-pass filters.

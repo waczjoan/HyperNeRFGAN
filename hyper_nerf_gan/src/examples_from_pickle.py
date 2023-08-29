@@ -3,7 +3,7 @@ import pathlib
 
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
-from nerf.load_blender import pose_spherical
+from hyper_nerf_gan.src.nerf.load_blender import pose_spherical
 import torch
 from tqdm import tqdm
 

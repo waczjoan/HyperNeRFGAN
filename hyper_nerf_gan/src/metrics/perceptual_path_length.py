@@ -14,7 +14,7 @@ https://github.com/NVlabs/stylegan/blob/master/metrics/perceptual_path_length.py
 import copy
 import numpy as np
 import torch
-import dnnlib
+import hyper_nerf_gan.src.dnnlib as dnnlib
 from . import metric_utils
 
 #----------------------------------------------------------------------------

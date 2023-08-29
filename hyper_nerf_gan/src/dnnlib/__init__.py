@@ -7,3 +7,4 @@
 # license agreement from NVIDIA CORPORATION is strictly prohibited.
 
 from .util import EasyDict, make_cache_dir_path
+from .util import Logger
