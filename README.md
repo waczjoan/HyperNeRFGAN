@@ -1,6 +1,6 @@
 ## HyperNeRFGAN: Hypernetwok approach to 3D NeRF GAN
 
-![CARLA](assets/carla.gif) ![ShapeNet](assets/shapenet.gif)
+![CARLA](hyper_nerf_gan/assets/carla.gif) ![ShapeNet](hyper_nerf_gan/assets/shapenet.gif)
 
 This repo contains implementation of ["HyperNeRFGAN: Hypernetwok approach to 3D NeRF GAN"](https://arxiv.org/abs/2301.11631). It's built on top of [INR-GAN](https://github.com/universome/inr-gan).
 The main idea behind HyperNeRFGAN is that the generator network is [INR](https://vsitzmann.github.io/siren/)-based, i.e. it produces parameters for a fully-connected neural network which implicitly represents a 3D object.
