@@ -61,7 +61,7 @@ class _GridSample2dForward(torch.autograd.Function):
 class _GridSample2dBackward(torch.autograd.Function):
     @staticmethod
     def forward(ctx, grad_output, input, grid):
-        op = torch._C._jit_get_operation('aten::grid_sampler_2d_backward')
+        op = torch.ops._jit_get_operation('aten::grid_sampler_2d_backward')
         grad_input, grad_grid = op(grad_output, input, grid, 0, 0, False)
         ctx.save_for_backward(grid)
         return grad_input, grad_grid
